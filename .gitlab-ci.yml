@@ -1,0 +1,81 @@
+stages:
+  - code_quality
+  - test_python3_8
+  - test_python3_12
+  - build
+  - deploy_testpypi
+  - deploy_pypi
+
+code_quality:
+  stage: code_quality
+  image: python:3.12
+  before_script:
+    - pip install --upgrade pip
+    - pip install pre-commit
+    - pre-commit install
+  script:
+    - pre-commit run --all-files
+  allow_failure: false
+
+test_python3_8:
+  stage: test
+  image: python:3.8
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt -r requirements-dev.txt
+  script:
+    - pytest tests/
+  artifacts:
+    when: always
+    paths:
+      - pytest_report.xml
+
+test_python3_12:
+  stage: test
+  image: python:3.12
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt -r requirements-dev.txt
+  script:
+    - pytest tests/
+  artifacts:
+    when: always
+    paths:
+      - pytest_report.xml
+
+build:
+  stage: build
+  image: python:3.12
+  script:
+    - pip install --upgrade pip
+    - pip install build
+    - python -m build
+  artifacts:
+    paths:
+      - dist/*
+
+deploy_testpypi:
+  stage: deploy_testpypi
+  image: python:3.12
+  script:
+    - pip install --upgrade pip
+    - pip install twine
+    - twine upload --repository-url https://test.pypi.org/legacy/ dist/* -u "__token__" -p "$PYPI_TEST_TOKEN"
+  only:
+    - tags
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+
+deploy_pypi:
+  stage: deploy_pypi
+  image: python:3.12
+  script:
+    - pip install --upgrade pip
+    - pip install twine
+    - twine upload dist/* -u "__token__" -p "$PYPI_TOKEN"
+  only:
+    - tags
+  when: manual
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
