@@ -21,5 +21,7 @@ dependencies = ["pandas", "pydantic", "requests"]
 where = ["src"]
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://www.steady-sun.com"
+Documentation = "https://www.steady-sun.com/api-documentation"
+Repository = "https://gitlab.com/steadysun/business-applications/steadysun_pipy"
+Issues = "https://gitlab.com/steadysun/business-applications/steadysun_pipy/issues"
