@@ -40,9 +40,7 @@ def get_forecast(
     api_data = SteadysunAPI().get(endpoint, params=params)
 
     # Convert the response to a pandas DataFrame
-    forecast_df = pd.DataFrame(
-        data=api_data["data"], index=api_data["index"], columns=api_data["columns"]
-    )
+    forecast_df = pd.DataFrame(data=api_data["data"], index=api_data["index"], columns=api_data["columns"])
 
     return forecast_df
 

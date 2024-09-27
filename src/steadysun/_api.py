@@ -17,9 +17,7 @@ class SteadysunAPI:
     def __init__(self):
         self.token = getenv(ENV_STEADYSUN_API_TOKEN, None)
         if self.token is None:
-            raise PermissionError(
-                f"{ENV_STEADYSUN_API_TOKEN} was not found in your environment."
-            )
+            raise PermissionError(f"{ENV_STEADYSUN_API_TOKEN} was not found in your environment.")
         self.timeout = 30
         self.base_url = STEADYSUN_API_URL
         self.headers = {
@@ -27,7 +25,11 @@ class SteadysunAPI:
         }
 
     def _make_request(
-        self, method: str, endpoint: str, params: dict = None, data: dict = None
+        self,
+        method: str,
+        endpoint: str,
+        params: dict = None,
+        data: dict = None,
     ):
         """Generalized method for making API requests."""
         url = f"{self.base_url}{endpoint}"
