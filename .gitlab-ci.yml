@@ -1,7 +1,6 @@
 stages:
   - code_quality
-  - test_python3_8
-  - test_python3_12
+  - test
   - build
   - deploy_testpypi
   - deploy_pypi
@@ -63,8 +62,6 @@ deploy_testpypi:
     - twine upload --repository-url https://test.pypi.org/legacy/ dist/* -u "__token__" -p "$PYPI_TEST_TOKEN"
   only:
     - tags
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
 
 deploy_pypi:
   stage: deploy_pypi
@@ -77,5 +74,3 @@ deploy_pypi:
     - tags
   when: manual
   allow_failure: false
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
