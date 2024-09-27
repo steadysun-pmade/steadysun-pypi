@@ -22,6 +22,7 @@ test_python3_8:
   before_script:
     - pip install --upgrade pip
     - pip install -r requirements.txt -r requirements-dev.txt
+    - pip install .
   script:
     - pytest tests/
   artifacts:
@@ -35,6 +36,7 @@ test_python3_12:
   before_script:
     - pip install --upgrade pip
     - pip install -r requirements.txt -r requirements-dev.txt
+    - pip install .
   script:
     - pytest tests/
   artifacts:
