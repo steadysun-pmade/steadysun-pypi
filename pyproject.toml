@@ -3,7 +3,7 @@ requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "steadysun-lib"
+name = "steadysun"
 dynamic = ["version"]
 authors = [{ name = "Pierrick MADE", email = "pierrick.made@steady-sun.com" }]
 description = "A package to interact with Steadysun's API"
@@ -19,6 +19,8 @@ dependencies = ["pandas", "pydantic", "requests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools_scm]
 
 [project.urls]
 Homepage = "https://www.steady-sun.com"
