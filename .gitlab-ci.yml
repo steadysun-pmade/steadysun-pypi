@@ -25,10 +25,6 @@ test_python3_8:
     - pip install .
   script:
     - pytest tests/
-  artifacts:
-    when: always
-    paths:
-      - pytest_report.xml
 
 test_python3_12:
   stage: test
@@ -38,11 +34,17 @@ test_python3_12:
     - pip install -r requirements.txt -r requirements-dev.txt
     - pip install .
   script:
-    - pytest tests/
+    - coverage run -m pytest tests/ --junitxml=report.xml
+    - coverage combine
+    - coverage report
+    - coverage xml -o coverage.xml
   artifacts:
-    when: always
-    paths:
-      - pytest_report.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: report.xml
+  coverage: '/^TOTAL.+?(\d+\%)$/'
 
 build:
   stage: build
