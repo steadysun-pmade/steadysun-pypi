@@ -2,8 +2,7 @@ stages:
   - code_quality
   - test
   - build
-  - deploy_testpypi
-  - deploy_pypi
+  - deploy
 
 code_quality:
   stage: code_quality
@@ -57,7 +56,7 @@ build:
       - dist/*
 
 deploy_testpypi:
-  stage: deploy_testpypi
+  stage: deploy
   image: python:3.12
   script:
     - pip install --upgrade pip
@@ -67,7 +66,7 @@ deploy_testpypi:
     - tags
 
 deploy_pypi:
-  stage: deploy_pypi
+  stage: deploy
   image: python:3.12
   script:
     - pip install --upgrade pip
