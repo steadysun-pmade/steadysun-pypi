@@ -25,6 +25,7 @@ class TestForecast(unittest.TestCase):
             site_uuid=self.TEST_SITE_PV_UUID,
             forecast_parameters=forecast_parameters,
         )
+        self.assertEqual(len(forecast_df.columns), 2)
         self.assertIn("all_sky_global_horizontal_irradiance", forecast_df.columns)
         self.assertIn("2m_temperature", forecast_df.columns)
 
@@ -40,5 +41,6 @@ class TestForecast(unittest.TestCase):
             site_uuid=self.TEST_SITE_PV_UUID,
             forecast_parameters=forecast_parameters,
         )
+        self.assertEqual(len(forecast_df.columns), 2)
         self.assertIn("all_sky_global_horizontal_irradiance", forecast_df.columns)
         self.assertIn("2m_temperature", forecast_df.columns)

@@ -44,6 +44,10 @@ get_solar_forecast(
 
 For detailed information about the API endpoints, parameters, and available data, please refer to the [Steadysun API Documentation](https://www.steady-sun.com/api-documentation/).
 
+## Package history (CHANGELOG)
+
+For detailed information on version updates of this package, please refer to the [CHANGELOG](./CHANGELOG.md).
+
 ## Contact
 
 For questions, issues, or support, feel free to reach out via email at <email@example.com>.

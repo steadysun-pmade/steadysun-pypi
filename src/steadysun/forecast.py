@@ -3,8 +3,8 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-from ._api import SteadysunAPI
 from ._models import ParameterModel
+from ._steadysun_api import SteadysunAPI
 
 
 class ForecastParameters(ParameterModel):
