@@ -1,8 +1,14 @@
 # Change Log
 
+## [0.0.8](https://test.pypi.org/project/steadysun/0.0.8) (2024-09-29)
+
+8th test release of the steadysun package.
+
+- **FIX** ..again.. the fix of the fix of auto create gitlab release when publishing to pypi
+
 ## [0.0.7](https://test.pypi.org/project/steadysun/0.0.7) (2024-09-29)
 
-6th test release of the steadysun package.
+7th test release of the steadysun package.
 
 - **FIX** ... the fix of the fix of auto create gitlab release when publishing to pypi
 
