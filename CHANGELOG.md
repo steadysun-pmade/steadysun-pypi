@@ -4,7 +4,8 @@
 
 8th test release of the steadysun package.
 
-- **FIX** ..again.. the fix of the fix of auto create gitlab release when publishing to pypi
+- **FIX** First really working version of the auto-gitlab-release
+- **ADD** Gitlab release takes the [CHANGELOG.md] associated version as a description
 
 ## [0.0.7](https://test.pypi.org/project/steadysun/0.0.7) (2024-09-29)
 
