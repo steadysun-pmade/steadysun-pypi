@@ -1,0 +1,9 @@
+[MASTER]
+init-hook='import sys; sys.path.append("./src/steadysun")'
+disable=
+    C0111, # missing-docstring
+    W1202, # lazy % formatting in logging functions (logging-fstring-interpolation)
+    W1203, # Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    R0903, # Too few public methods
+[FORMAT]
+max-line-length=120

@@ -1,5 +1,8 @@
+import os
 import unittest
 
+from steadysun._steadysun_api import ENV_STEADYSUN_API_TOKEN
+from steadysun.exceptions import APIError, NotFoundError, UnauthorizedError
 from steadysun.forecast import ForecastParameters, get_solar_forecast
 
 
@@ -12,6 +15,20 @@ class TestForecast(unittest.TestCase):
         """Test the basic get forecast request"""
         forecast_df = get_solar_forecast(site_uuid=self.TEST_SITE_PV_UUID)
         self.assertIn("2m_temperature", forecast_df.columns)
+
+    def test_get_forecast_bad_uuid(self):
+        """Test the basic get forecast request with a bad pv"""
+        with self.assertRaises(NotFoundError) as context:
+            get_solar_forecast(site_uuid="bad_uuid")
+        self.assertIsInstance(context.exception, APIError)
+
+    def test_get_forecast_bad_token(self):
+        """Test the basic get forecast request with a bad token"""
+        token_tmp = os.environ[ENV_STEADYSUN_API_TOKEN]
+        os.environ[ENV_STEADYSUN_API_TOKEN] = "a" * 40
+        with self.assertRaises(UnauthorizedError):
+            get_solar_forecast(site_uuid=self.TEST_SITE_PV_UUID)
+        os.environ[ENV_STEADYSUN_API_TOKEN] = token_tmp
 
     def test_get_forecast_with_dict(self):
         """Test the basic get forecast request with a dict"""

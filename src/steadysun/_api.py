@@ -1,47 +1,10 @@
-class APIError(Exception):
-    """Base class for all API-related errors."""
+import logging
 
+import requests
 
-class BadRequestError(APIError):
-    """Raised when the API returns a 400 Bad Request."""
+from .exceptions import ERROR_MAP, APIError, BadRequestError, NotFoundError
 
-    def __init__(self, message):
-        super().__init__(f"400 Bad Request: {message}")
-
-
-class UnauthorizedError(APIError):
-    """Raised when the API returns a 401 Unauthorized."""
-
-    def __init__(self, message="You need to authenticate first."):
-        super().__init__(f"401 Unauthorized: {message}")
-
-
-class ForbiddenError(APIError):
-    """Raised when the API returns a 403 Forbidden."""
-
-    def __init__(self, message="You don't have permission to access this resource."):
-        super().__init__(f"403 Forbidden: {message}")
-
-
-class TooManyRequestsError(APIError):
-    """Raised when the API returns a 429 Too Many Requests."""
-
-    def __init__(self, message="You have exceeded your request quota."):
-        super().__init__(f"429 Too Many Requests: {message}")
-
-
-class InternalServerError(APIError):
-    """Raised when the API returns a 500 Internal Server Error."""
-
-    def __init__(self, message="An unexpected server error occurred."):
-        super().__init__(f"500 Internal Server Error: {message}")
-
-
-class BadGatewayError(APIError):
-    """Raised when the API returns a 502 Bad Gateway."""
-
-    def __init__(self, message="Server timeout, please try again after 30 seconds."):
-        super().__init__(f"502 Bad Gateway: {message}")
+logger = logging.getLogger(__name__)
 
 
 class APIResponseHandler:
@@ -53,49 +16,40 @@ class APIResponseHandler:
         self.text = response.text
 
     def handle(self):
-        """Process the response and handle errors based on the status code."""
-        if 200 <= self.status_code < 300:
+        """Process the response, raise errors for non-success status codes"""
+        try:
+            self.response.raise_for_status()
             return self._handle_success()
-
-        return self._handle_error()
+        except requests.exceptions.HTTPError as http_err:
+            self._handle_error(http_err)
+            return None
 
     def _handle_success(self):
-        """Handle successful responses (2xx status codes)."""
-        if self.status_code == 200:
-            return self._parse_json()
-        if self.status_code == 201:
+        """Handle successful responses (2xx status codes)"""
+
+        if self.status_code in [200, 201]:
+            logger.info(f"Request succeeded with status {self.status_code}: {self.text}")
             return self._parse_json()
         if self.status_code == 204:
-            return {"message": "Resource deleted successfully."}  # No content for 204
+            logger.info("Resource successfully deleted.")
+            return {"message": "Resource successfully deleted."}
         return {"message": "Unknown success response."}
 
-    def _handle_error(self):
+    def _handle_error(self, http_err):
         """Handle error responses (4xx and 5xx status codes)."""
-        if self.status_code == 400:
-            raise BadRequestError(self._get_error_message())
-        if self.status_code == 401:
-            raise UnauthorizedError()
-        if self.status_code == 403:
-            raise ForbiddenError()
-        if self.status_code == 429:
-            raise TooManyRequestsError()
-        if self.status_code == 500:
-            raise InternalServerError()
-        if self.status_code == 502:
-            raise BadGatewayError()
-        raise APIError(f"Unhandled error: {self.status_code}, Response: {self.text}")
+        error_class = ERROR_MAP.get(self.status_code, None)
+        if error_class is None:
+            raise APIError(self.status_code, "Request error", f"Response: {self.text}") from http_err
+        if error_class is NotFoundError:
+            raise error_class(self.response.url) from http_err
+        if error_class is BadRequestError:
+            raise error_class(self._parse_json()) from http_err
+        raise error_class() from http_err
 
     def _parse_json(self):
         """Attempt to parse the JSON response."""
         try:
             return self.response.json()
         except ValueError:
+            logger.warning("Failed to parse JSON from response.")
             return {"error": "Response body is not valid JSON", "text": self.text}
-
-    def _get_error_message(self):
-        """Extract the error message from the response body, if available."""
-        try:
-            error_data = self.response.json()
-            return error_data.get("message", self.text)  # Return the error message if present
-        except ValueError:
-            return self.text

@@ -62,4 +62,4 @@ class ParameterModel(BaseModel):
         try:
             return cls(**processed_data)
         except ValidationError as e:
-            raise ValueError from e
+            raise ValueError(e) from e

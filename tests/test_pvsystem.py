@@ -3,7 +3,13 @@ import math
 import os
 import unittest
 
-from steadysun.pvsystem import create_pvsystem, delete_pvsystem, get_pvsystem_config
+from steadysun.pvsystem import (
+    create_pvsystem,
+    delete_pvsystem,
+    get_pvsystem_config,
+    get_pvsystem_list,
+    get_pvsystem_uuids,
+)
 from tests import DATA_DIR
 
 
@@ -28,14 +34,36 @@ class TestPvsystem(unittest.TestCase):
             self.basic_config = json.load(f)
         return super().setUp()
 
+    def test_get_pvsystem_list_first_page(self):
+        """Test the get_pvsystem_list request but only first page and limit"""
+        pv_list = get_pvsystem_list(page_limit=3)
+        self.assertIn("results", pv_list)
+        self.assertEqual(len(pv_list["results"]), 3)
+
+    @unittest.skip("Really long request if the token have access to all systems")
+    def test_get_pvsystem_list_all_pages(self):
+        """Test the get_pvsystem_list request with all pages"""
+        pv_list = get_pvsystem_list(page_limit=100, get_all_pages=True)
+        self.assertIn("count", pv_list)
+        self.assertIn("results", pv_list)
+        self.assertEqual(len(pv_list["results"]), pv_list["count"])
+
+    @unittest.skip("Really long request if the token have access to all systems")
+    def test_get_pvsystem_uuids(self):
+        """Test the get_pvsystem_uuids request"""
+        pv_list = get_pvsystem_uuids()
+        self.assertIsInstance(pv_list, list)
+
     def test_create_get_delete_pvsystem(self):
         """Test the basic get forecast request"""
         pvsystem_config = create_pvsystem(config=self.basic_config)
         self.assertIn("uuid", pvsystem_config)
         del self.basic_config["inverter_parameters"]
         self.assertTrue(_compare_config(self.basic_config, pvsystem_config))
+
         pvsystem_config = get_pvsystem_config(site_uuid=pvsystem_config["uuid"])
         del self.basic_config["arrays"]
         del self.basic_config["pv_type"]
         self.assertTrue(_compare_config(self.basic_config, pvsystem_config))
+
         delete_pvsystem(site_uuid=pvsystem_config["uuid"])
