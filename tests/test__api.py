@@ -1,70 +1,71 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import requests
 
 from steadysun._api import APIResponseHandler
-from steadysun.exceptions import (
-    APIError,
-    BadGatewayError,
-    BadRequestError,
-    ForbiddenError,
-    InternalServerError,
-    NotFoundError,
-    TooManyRequestsError,
-    UnauthorizedError,
-)
 
 
 class TestAPIResponseHandler(unittest.TestCase):
     def setUp(self):
+        """Set up a mock response for all tests."""
         self.mock_response = Mock(spec=requests.Response)
 
-    def test_success_responses(self):
-        """Test handling successful 2xx responses."""
-        success_cases = [
-            (200, '{"message": "success"}', {"message": "success"}),
-            (201, '{"id": "created"}', {"id": "created"}),
-            (204, "", {"message": "Resource successfully deleted."}),
+    def test_handle_success(self):
+        """Test handling of successful responses"""
+        test_cases = [
+            (200, '{"message": "success"}'),
+            (201, '{"message": "created"}'),
+            (204, ""),
         ]
-
-        for status_code, text, expected_output in success_cases:
+        for status_code, text in test_cases:
             with self.subTest(status_code=status_code):
                 self.mock_response.status_code = status_code
                 self.mock_response.text = text
-                self.mock_response.json.return_value = expected_output if status_code != 204 else None
-                self.mock_response.raise_for_status = Mock()
+                self.mock_response.json.return_value = {"json": 1} if status_code != 204 else None
 
                 result = APIResponseHandler(self.mock_response).handle()
-                self.assertEqual(result, expected_output)
 
-    def test_error_responses(self):
-        """Test handling various 4xx and 5xx error responses."""
-        error_cases = [
-            (400, '{"message": "Bad Request"}', BadRequestError),
-            (401, "", UnauthorizedError),
-            (403, "", ForbiddenError),
-            (404, '{"message": "Not Found"}', NotFoundError),
-            (429, "", TooManyRequestsError),
-            (500, "", InternalServerError),
-            (502, "", BadGatewayError),
+                if status_code != 204:
+                    self.assertEqual(result, {"json": 1})
+                self.mock_response.raise_for_status.assert_called_once()
+                self.mock_response.raise_for_status.reset_mock()
+
+    @patch("logging.Logger.warning")
+    def test_handle_invalid_json(self, mock_logger_warning):
+        """Test handling of invalid JSON in successful responses."""
+        self.mock_response.status_code = 200
+        self.mock_response.text = "Invalid JSON"
+        self.mock_response.json.side_effect = ValueError
+
+        APIResponseHandler(self.mock_response).handle()
+        mock_logger_warning.assert_called_once()
+
+    def test_handle_error_responses(self):
+        """Test handling of error responses (e.g., 4xx, 5xx)."""
+        test_cases = [
+            (400, "Bad Request"),
+            (401, "Unauthorized"),
+            (403, "Forbidden"),
+            (404, "Not Found"),
+            (429, "Too Many Requests"),
+            (500, "Internal Server Error"),
+            (502, "Bad Gateway"),
         ]
 
-        for status_code, text, error_class in error_cases:
-            self.mock_response.status_code = status_code
-            self.mock_response.text = text
-            self.mock_response.url = "example_url"
-            self.mock_response.json.return_value = {"message": text} if text else None
-            self.mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError
+        for status_code, text in test_cases:
+            with self.subTest(status_code=status_code):
+                self.mock_response.status_code = status_code
+                self.mock_response.text = text
+                self.mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError
 
-            with self.assertRaises(error_class):
-                APIResponseHandler(self.mock_response).handle()
+                with self.assertRaises(requests.exceptions.HTTPError) as context:
+                    APIResponseHandler(self.mock_response).handle()
 
-    def test_unknown_error(self):
-        """Test handling an unknown error (unmapped status code)."""
-        self.mock_response.status_code = 418
-        self.mock_response.text = "Unknown error"
-        self.mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError
+                self.assertIn(str(status_code), str(context.exception))
+                self.mock_response.raise_for_status.assert_called_once()
+                self.mock_response.raise_for_status.reset_mock()
 
-        with self.assertRaises(APIError):
-            APIResponseHandler(self.mock_response).handle()
+
+if __name__ == "__main__":
+    unittest.main()

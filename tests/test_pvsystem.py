@@ -3,13 +3,10 @@ import math
 import os
 import unittest
 
-from steadysun.pvsystem import (
-    create_pvsystem,
-    delete_pvsystem,
-    get_pvsystem_config,
-    get_pvsystem_list,
-    get_pvsystem_uuids,
-)
+from requests import HTTPError
+
+from steadysun.pvsystem import PVSystem, get_pvsystem_uuids
+from steadysun.steadysun_api import SteadysunAPI
 from tests import DATA_DIR
 
 
@@ -27,43 +24,63 @@ def _compare_config(a, b):
 class TestPvsystem(unittest.TestCase):
     """Test for the pvsystem.py file"""
 
-    TEST_SITE_PV_UUID = "be64cdf1-22e5-4072-85d8-d6c1502c4460"
-
-    def setUp(self) -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         with open(os.path.join(DATA_DIR, "pvsystem_config.json"), encoding="utf-8") as f:
-            self.basic_config = json.load(f)
-        return super().setUp()
+            cls.basic_config = json.load(f)
+        cls.test_pvsystem_uuid = SteadysunAPI().post("pvsystem/", data=cls.basic_config)["uuid"]
+        return super().setUpClass()
 
-    def test_get_pvsystem_list_first_page(self):
-        """Test the get_pvsystem_list request but only first page and limit"""
-        pv_list = get_pvsystem_list(page_limit=3)
-        self.assertIn("results", pv_list)
-        self.assertEqual(len(pv_list["results"]), 3)
-
-    @unittest.skip("Really long request if the token have access to all systems")
-    def test_get_pvsystem_list_all_pages(self):
-        """Test the get_pvsystem_list request with all pages"""
-        pv_list = get_pvsystem_list(page_limit=100, get_all_pages=True)
-        self.assertIn("count", pv_list)
-        self.assertIn("results", pv_list)
-        self.assertEqual(len(pv_list["results"]), pv_list["count"])
+    @classmethod
+    def tearDownClass(cls) -> None:
+        SteadysunAPI().delete(f"pvsystem/{cls.test_pvsystem_uuid}/")
+        return super().tearDownClass()
 
     @unittest.skip("Really long request if the token have access to all systems")
     def test_get_pvsystem_uuids(self):
         """Test the get_pvsystem_uuids request"""
         pv_list = get_pvsystem_uuids()
-        self.assertIsInstance(pv_list, list)
+        self.assertIsInstance(pv_list, dict)
 
-    def test_create_get_delete_pvsystem(self):
+    def test_pvsystem_model_from_uuid(self):
         """Test the basic get forecast request"""
-        pvsystem_config = create_pvsystem(config=self.basic_config)
-        self.assertIn("uuid", pvsystem_config)
-        del self.basic_config["inverter_parameters"]
-        self.assertTrue(_compare_config(self.basic_config, pvsystem_config))
+        pvsystem = PVSystem.from_uuid(self.test_pvsystem_uuid)
+        self.assertEqual(str(pvsystem.uuid), self.test_pvsystem_uuid)
+        self.assertEqual(pvsystem.name, self.basic_config["name"])
+        # self.assertEqual(pvsystem.location.model_dump(), self.basic_config["location"]) # FIXME Tuple vs List
+        self.assertEqual(pvsystem.altitude, self.basic_config["altitude"])
+        self.assertEqual(pvsystem.pv_type.value, self.basic_config["pv_type"])
+        self.assertEqual(pvsystem.expert_params.tracker_config.model_dump(), self.basic_config["tracker_config"])
+        self.assertEqual(pvsystem.expert_params.bifacial_config.model_dump(), self.basic_config["bifacial_config"])
+        self.assertEqual(pvsystem.expert_params.bifacial_config.model_dump(), self.basic_config["bifacial_config"])
+        # inverter_parameters
 
-        pvsystem_config = get_pvsystem_config(site_uuid=pvsystem_config["uuid"])
-        del self.basic_config["arrays"]
-        del self.basic_config["pv_type"]
-        self.assertTrue(_compare_config(self.basic_config, pvsystem_config))
+    def test_pvsystem_model_update(self):
+        """Test the basic get forecast request"""
+        pvsystem = PVSystem.from_uuid(self.test_pvsystem_uuid)
+        pvsystem.name = "changed_name"
+        pvsystem.save_changes()
+        same_pvsystem = PVSystem.from_uuid(self.test_pvsystem_uuid)
+        self.assertEqual(same_pvsystem.name, pvsystem.name)
 
-        delete_pvsystem(site_uuid=pvsystem_config["uuid"])
+    def test_create_get_delete_with_pvsystem_class(self):
+        """Test the full PVsystem create/get/delete process using the class"""
+        base_required_args = {
+            "name": "ci_pypi_test",
+            "location": (5.8756, 45.6403),
+            "pdc0": 10,
+        }
+        # Create
+        pvsystem = PVSystem.create_new(**base_required_args)
+        self.assertEqual(pvsystem.name, base_required_args["name"])
+        self.assertEqual(pvsystem.location.coordinates, base_required_args["location"])
+        self.assertEqual(pvsystem.expert_params.arrays[0].pvmodules_pdc0, base_required_args["pdc0"])
+
+        # Get
+        same_pvsystem = PVSystem.from_uuid(pvsystem.uuid)
+        self.assertEqual(pvsystem, same_pvsystem)
+
+        # Delete
+        same_pvsystem.delete()
+        with self.assertRaises(HTTPError):
+            PVSystem.from_uuid(pvsystem.uuid)

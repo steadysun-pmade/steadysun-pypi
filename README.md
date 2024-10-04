@@ -22,21 +22,21 @@ pip install steadysun
 Here's an example of how to use `steadysun`:
 
 ```python
-from steadysun.client import SteadysunClient
-from steadysun import forecast
+from steadysun.steadysun_api import SteadysunAPI
+from steadysun.forecast import get_forecast
 
 # You can either set your token in your env at "STEADYSUN_API_TOKEN"
 # OR use the following line :
 SteadysunClient.set_api_token("YOUR_TOKEN")
 
-get_solar_forecast(
-    site_uuid="testts",
-    forecast_parameters={
-        "time_step": 30,
-        "horizon": 2440,
-        "precision": 4,
-        "fields": ["ghi", "dni"],
-    },
+forecast_df = get_forecast("SITE_UUID")
+
+forecast_df = get_forecast(
+    site_uuid="SITE_UUID",
+    time_step=30,
+    horizon=2440,
+    precision=4,
+    fields=["all_sky_global_horizontal_irradiance", "2m_temperature"],
 )
 ```
 

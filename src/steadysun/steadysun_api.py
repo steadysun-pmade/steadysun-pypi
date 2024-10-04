@@ -5,14 +5,8 @@ import requests
 from ._api import APIResponseHandler
 
 ENV_STEADYSUN_API_TOKEN = "STEADYSUN_API_TOKEN"
+ENV_STEADYSUN_API_URL = "STEADYSUN_API_URL"
 DEFAULT_STEADYSUN_API_URL = "https://steadyweb.steady-sun.com/api/v1/"
-
-
-class BadRequestException(Exception):
-    """Raised when the sent request have issues."""
-
-    def __init__(self, message):
-        super().__init__(message)
 
 
 class SteadysunAPI:
@@ -23,10 +17,10 @@ class SteadysunAPI:
     to the Steadysun API, handling authorization and response validation automatically.
     """
 
-    def __init__(self, timeout: int = 30, base_url: str = None):
+    def __init__(self, timeout: int = 30):
         self.token = self.retrieve_token_from_env()
         self.timeout = timeout
-        self.base_url = base_url or DEFAULT_STEADYSUN_API_URL
+        self.base_url = getenv(ENV_STEADYSUN_API_URL, DEFAULT_STEADYSUN_API_URL)
         self.headers = {
             "Authorization": f"Token {self.token}",
         }

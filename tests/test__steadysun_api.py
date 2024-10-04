@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from steadysun._steadysun_api import ENV_STEADYSUN_API_TOKEN, SteadysunAPI
+from steadysun.steadysun_api import ENV_STEADYSUN_API_TOKEN, SteadysunAPI
 
 
 class TestSteadysunApi(unittest.TestCase):

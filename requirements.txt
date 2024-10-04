@@ -1,3 +1,5 @@
+geojson
 pandas
 pydantic
+pydantic-geojson
 requests

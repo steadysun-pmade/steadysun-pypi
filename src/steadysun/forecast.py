@@ -1,13 +1,12 @@
-from functools import partial
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
+from pydantic import BaseModel, field_validator
 
-from ._models import ParameterModel
-from ._steadysun_api import SteadysunAPI
+from .steadysun_api import SteadysunAPI
 
 
-class ForecastParameters(ParameterModel):
+class _ForecastParameters(BaseModel):
     """Available parameters for the get_forecast API call.
 
     See default values and more information about each parameters at:
@@ -17,24 +16,52 @@ class ForecastParameters(ParameterModel):
     time_step: Optional[int] = None
     horizon: Optional[int] = None
     precision: Optional[int] = None
-    fields: Optional[List[str]] = None
+    fields: Optional[Union[List[str], str]] = None
     date_time_format: Optional[str] = None
     time_stamp_unit: Optional[str] = None
-    # TODO add data_format (add also df / csv / json ?)
+    # data_format have specifics functions (use Forecast functions : as_json, as_csv)
+
+    class Config:
+        validate_assignment = True
+
+    @field_validator("fields")
+    @classmethod
+    def handle_fields(cls, fields: Optional[Union[List[str], str]]):
+        if fields is None:
+            return None
+        if len(fields) == 0:
+            raise ValueError("Fields can't be an empty list (You can set it to None to get all available fields)")
+        if isinstance(fields, list):
+            fields = ",".join(map(str, fields))
+        if isinstance(fields, str):
+            fields = fields.replace("[", "").replace("]", "")
+
+        return fields if len(fields) else None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert the attributes to a dictionary adapted to api_requests (excluding None values)
+        """
+        return super().model_dump(exclude_none=True)
 
 
+# pylint: disable=too-many-arguments, unused-argument
 def get_forecast(
-    site_type: str,
     site_uuid: str,
-    forecast_parameters: Union[ForecastParameters, dict] = None,
-):
+    time_step: Optional[int] = None,
+    horizon: Optional[int] = None,
+    precision: Optional[int] = None,
+    fields: Optional[List[str]] = None,
+    date_time_format: Optional[str] = None,
+    time_stamp_unit: Optional[str] = None,
+    raw_api_response: Optional[bool] = False,
+) -> pd.DataFrame:
     """Fetch forecast data for a specific site."""
 
-    if isinstance(forecast_parameters, dict):
-        forecast_parameters = ForecastParameters.from_param_dict(forecast_parameters)
+    forecast_parameters = _ForecastParameters(**{k: v for k, v in locals().items() if k != "site_uuid"})
 
-    endpoint = f"forecast/{site_type}/{site_uuid}/"
-    params = forecast_parameters.to_param_dict() if forecast_parameters else None
+    endpoint = f"forecast/pvsystem/{site_uuid}/"
+    params = forecast_parameters.to_dict()
 
     # Make the GET call
     api_data = SteadysunAPI().get(endpoint, params=params)
@@ -43,9 +70,3 @@ def get_forecast(
     forecast_df = pd.DataFrame(data=api_data["data"], index=api_data["index"], columns=api_data["columns"])
 
     return forecast_df
-
-
-get_solar_forecast = partial(get_forecast, site_type="pvsystem")
-get_group_forecast = partial(get_forecast, site_type="group")
-get_windfarm_forecast = partial(get_forecast, site_type="windfarm")
-get_windturbine_forecast = partial(get_forecast, site_type="windturbine")
