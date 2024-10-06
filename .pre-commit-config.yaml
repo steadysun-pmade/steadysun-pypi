@@ -30,3 +30,9 @@ repos:
     hooks:
     -   id: flake8
         args: [--max-line-length=120]
+
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [-vv, --fail-under=90]

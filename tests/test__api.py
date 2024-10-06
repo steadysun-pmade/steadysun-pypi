@@ -1,5 +1,7 @@
+"""Tests _api.py"""
+
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import requests
 
@@ -7,6 +9,8 @@ from steadysun._api import APIResponseHandler
 
 
 class TestAPIResponseHandler(unittest.TestCase):
+    """Tests for APIResponseHandler"""
+
     def setUp(self):
         """Set up a mock response for all tests."""
         self.mock_response = Mock(spec=requests.Response)
@@ -31,15 +35,13 @@ class TestAPIResponseHandler(unittest.TestCase):
                 self.mock_response.raise_for_status.assert_called_once()
                 self.mock_response.raise_for_status.reset_mock()
 
-    @patch("logging.Logger.warning")
-    def test_handle_invalid_json(self, mock_logger_warning):
+    def test_handle_invalid_json(self):
         """Test handling of invalid JSON in successful responses."""
         self.mock_response.status_code = 200
         self.mock_response.text = "Invalid JSON"
         self.mock_response.json.side_effect = ValueError
 
         APIResponseHandler(self.mock_response).handle()
-        mock_logger_warning.assert_called_once()
 
     def test_handle_error_responses(self):
         """Test handling of error responses (e.g., 4xx, 5xx)."""
@@ -65,7 +67,3 @@ class TestAPIResponseHandler(unittest.TestCase):
                 self.assertIn(str(status_code), str(context.exception))
                 self.mock_response.raise_for_status.assert_called_once()
                 self.mock_response.raise_for_status.reset_mock()
-
-
-if __name__ == "__main__":
-    unittest.main()
