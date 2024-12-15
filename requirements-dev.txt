@@ -4,5 +4,7 @@ pytest-cov
 
 sphinx
 autodocsumm
-sphinx-rtd-theme
 autodoc_pydantic
+sphinx-rtd-theme
+sphinx_tabs
+sphinx_copybutton
