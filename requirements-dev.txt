@@ -1,3 +1,8 @@
 pre-commit
 pytest
 pytest-cov
+
+sphinx
+autodocsumm
+sphinx-rtd-theme
+autodoc_pydantic

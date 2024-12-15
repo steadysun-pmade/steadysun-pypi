@@ -36,3 +36,4 @@ repos:
     hooks:
       - id: interrogate
         args: [-vv, --fail-under=90]
+        exclude: "docs/.*"

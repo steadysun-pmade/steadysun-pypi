@@ -27,7 +27,7 @@ from steadysun.forecast import get_forecast
 
 # You can either set your token in your env at "STEADYSUN_API_TOKEN"
 # OR use the following line :
-SteadysunClient.set_api_token("YOUR_TOKEN")
+SteadysunAPI.set_api_token("YOUR_TOKEN")
 
 forecast_df = get_forecast("SITE_UUID")
 

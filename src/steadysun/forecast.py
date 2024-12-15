@@ -2,13 +2,6 @@
 
 It includes the `_ForecastParameters` class to model the parameters for the forecast API request, and
 the `get_forecast` function to retrieve forecast data as a pandas DataFrame.
-
-Classes:
-    _ForecastParameters: Defines the available parameters for the forecast API call.
-
-Functions:
-    get_forecast(site_uuid, time_step, horizon, precision, fields, use_timestamp_format, time_stamp_unit):
-        Fetches forecast data for a specific site based on provided parameters.
 """
 
 from typing import Any, Dict, List, Literal, Optional, Union
@@ -90,7 +83,8 @@ def get_forecast(
     use_timestamp_format: bool = False,
     time_stamp_unit: Optional[Literal["ms", "s"]] = None,
 ) -> pd.DataFrame:
-    """Fetch forecast data for a specific site with given parameters.
+    """
+    Fetch forecast data for a specific site with given parameters.
 
     See default values and more information about each parameters at:
     https://www.steady-sun.com/api-documentation/#section__parameters
@@ -112,15 +106,15 @@ def get_forecast(
 
     Example:
         Fetch forecast data for a specific site with a time step of 30 minutes, a horizon of 2440 minutes,
-        a precision of 4 decimal places, and including the "all_sky_global_horizontal_irradiance" and "2m_temperature":
+        a precision of 4 decimal places, and including the "all_sky_global_horizontal_irradiance" and "2m_temperature"::
 
-        forecast_df = get_forecast(
-            site_uuid="SITE_UUID",
-            time_step=30,
-            horizon=2440,
-            precision=4,
-            fields=["all_sky_global_horizontal_irradiance", "2m_temperature"],
-        )
+            forecast_df = get_forecast(
+                site_uuid="SITE_UUID",
+                time_step=30,
+                horizon=2440,
+                precision=4,
+                fields=["all_sky_global_horizontal_irradiance", "2m_temperature"],
+            )
     """
     forecast_parameters = _ForecastParameters(
         time_step=time_step,
