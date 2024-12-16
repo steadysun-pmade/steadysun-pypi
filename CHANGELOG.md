@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.10](https://test.pypi.org/project/steadysun/0.0.10) (2024-12-16)
+
+10th test release of the steadysun package.
+
+- **ADD** Documentation with Sphinx/readthedoc + mirror to public github
+
 ## [0.0.9](https://test.pypi.org/project/steadysun/0.0.9) (2024-10-04)
 
 1st "good" release of the steadysun package ! >ith too much changes
