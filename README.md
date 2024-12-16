@@ -1,6 +1,6 @@
 # Steadysun Package
 
-A Python package designed to facilitate interaction with the **Steadysun** API.
+A Python package designed to facilitate interaction with the [**Steadysun** API](https://steadyweb.steady-sun.com/rapidoc/).
 
 ## Features
 
@@ -40,9 +40,11 @@ forecast_df = get_forecast(
 )
 ```
 
-## API Documentation
+## Documentation
 
-For detailed information about the API endpoints, parameters, and available data, please refer to the [Steadysun API Documentation](https://www.steady-sun.com/api-documentation/).
+- **Package doc** : For detailed information about this package, please refer to [https://steadysun-pypi.readthedocs.io](https://steadysun-pypi.readthedocs.io).
+- **API doc** : For detailed information about the API endpoints, parameters, and available data, please refer to the [Steadysun API Documentation](https://steadyweb.steady-sun.com/rapidoc/).
+
 
 ## Package history (CHANGELOG)
 
@@ -50,9 +52,9 @@ For detailed information on version updates of this package, please refer to the
 
 ## Contact
 
-For questions, issues, or support, feel free to reach out via email at <email@example.com>.
+For questions, issues, or support, feel free to reach out via email at <contact@steady-sun.com>.
 
-You can also submit ideas or report issues on the [GitLab Issues page](https://gitlab.com/steadysun/business-applications/steadysun_pipy/-/issues).
+You can also submit ideas or report issues on the [GitHub Issues page](https://github.com/steadysun-pmade/steadysun-pypi/issues).
 
 ## License
 

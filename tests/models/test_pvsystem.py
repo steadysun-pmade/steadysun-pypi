@@ -1,6 +1,6 @@
 import unittest
 
-from steadysun._pvsystem_models import Array, ModuleMaterial, ModuleTechnology, PVSystemExpertParams, Racking
+from steadysun.models.pvsystem import Array, ModuleMaterial, ModuleTechnology, PVSystemExpertParams, Racking
 
 
 class TestPVSystem(unittest.TestCase):

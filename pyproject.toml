@@ -24,7 +24,7 @@ where = ["src"]
 
 [project.urls]
 Homepage = "https://www.steady-sun.com"
-Documentation = "https://www.steady-sun.com/api-documentation"
-Repository = "https://gitlab.com/steadysun/business-applications/steadysun_pipy"
-Issues = "https://gitlab.com/steadysun/business-applications/steadysun_pipy/issues"
-Changelog = "https://gitlab.com/steadysun/business-applications/steadysun_pipy/-/blob/master/CHANGELOG.md"
+Documentation = "https://steadysun-pypi.readthedocs.io"
+Repository = "https://github.com/steadysun-pmade/steadysun-pypi/issues"
+Issues = "https://github.com/steadysun-pmade/steadysun-pypi/issues"
+Changelog = "https://github.com/steadysun-pmade/steadysun-pypi/blob/master/CHANGELOG.md"

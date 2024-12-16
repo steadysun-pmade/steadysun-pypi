@@ -16,7 +16,7 @@ class _ForecastParameters(BaseModel):
     """Available parameters for the get_forecast API call.
 
     See default values and more information about each parameters at:
-    https://www.steady-sun.com/api-documentation/#section__parameters
+    https://steadyweb.steady-sun.com/rapidoc/#get-/forecast/-object_type-/-component_uuid-/
 
     Attributes:
         time_step (Optional[int]): The time step of the forecast (in minutes).
@@ -87,7 +87,7 @@ def get_forecast(
     Fetch forecast data for a specific site with given parameters.
 
     See default values and more information about each parameters at:
-    https://www.steady-sun.com/api-documentation/#section__parameters
+    https://steadyweb.steady-sun.com/rapidoc/#get-/forecast/-object_type-/-component_uuid-/
 
     Args:
         site_uuid (str): The UUID of the site.

@@ -1,5 +1,5 @@
-forecast
-=================
+Core forecast functions
+=======================
 
 .. automodule:: steadysun.forecast
    :members:

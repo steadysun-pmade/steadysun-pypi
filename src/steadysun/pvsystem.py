@@ -19,8 +19,9 @@ from geojson import Point
 from pydantic import FiniteFloat, NonNegativeFloat, StrictStr, field_validator
 from pydantic_geojson import PointModel
 
-from ._pvsystem_models import PVSystemExpertParams, PVType, TypeCheckingBaseModel
-from .steadysun_api import SteadysunAPI
+from steadysun.models._utils import TypeCheckingBaseModel
+from steadysun.models.pvsystem import PVSystemExpertParams, PVType
+from steadysun.steadysun_api import SteadysunAPI
 
 
 class PVSystem(TypeCheckingBaseModel):
