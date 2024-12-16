@@ -30,7 +30,7 @@ so you should just have to run:
     .. tab:: from GitHub
         .. code:: console
 
-            $ git clone https://github.com/Steadysun/steadysun.git
+            $ git clone https://github.com/steadysun-pmade/steadysun-pypi.git
             $ cd steadysun
             $ pip install -e .
 
