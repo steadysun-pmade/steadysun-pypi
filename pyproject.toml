@@ -25,6 +25,6 @@ where = ["src"]
 [project.urls]
 Homepage = "https://www.steady-sun.com"
 Documentation = "https://steadysun-pypi.readthedocs.io"
-Repository = "https://github.com/steadysun-pmade/steadysun-pypi/issues"
+Repository = "https://github.com/steadysun-pmade/steadysun-pypi"
 Issues = "https://github.com/steadysun-pmade/steadysun-pypi/issues"
 Changelog = "https://github.com/steadysun-pmade/steadysun-pypi/blob/master/CHANGELOG.md"
